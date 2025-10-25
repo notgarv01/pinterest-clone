@@ -39,9 +39,10 @@ var arr = [
 function showTheCards() {
   var clutter = "";
   arr.forEach(function (obj) {
-    clutter += `<div class="box">
+    const id = obj.name.toLowerCase().replace(/\s+/g, "-");
+    clutter += `<div class="box text-zinc-900" id="${id}">
         <img class="cursor-pointer" src="${obj.image}" alt="image">
-        <div class="caption">Lorem ipsum </div>
+        <div class="caption text-zinc-900">Lorem ipsum </div>
     </div>`;
   });
   document.querySelector(".container").innerHTML = clutter;
@@ -49,6 +50,7 @@ function showTheCards() {
 
 function handleSearch() {
   var input = document.querySelector("#searchinput");
+  var suggestionBox = document.querySelector(".searchdata");
 
   input.addEventListener("focus", function () {
     document.querySelector(".overlay").style.display = "block";
@@ -67,8 +69,34 @@ function handleSearch() {
             <h3 class="font-semibold">${obj.name}</h3>
         </div>`;
     });
-    document.querySelector(".searchdata").style.display = "block";
-    document.querySelector(".searchdata").innerHTML = clutter;
+    suggestionBox.style.display = "block";
+    suggestionBox.innerHTML = clutter;
+
+    const suggestions = suggestionBox.querySelectorAll(".res");
+    suggestions.forEach((element, index) => {
+      element.addEventListener("click", function () {
+        const name = filteredArray[index].name;
+        console.log(name);
+
+        const cardId = name.toLowerCase().replace(/\s+/g, "-");
+        const card = document.getElementById(cardId);
+        if (card) {
+          card.scrollIntoView({ behavior: "smooth", block: "center" });
+
+          // Highlight card with red glow
+          card.animate(
+            [
+              { boxShadow: "0 0 0 rgba(230,0,35,0)" },
+              { boxShadow: "0 0 40px rgba(230,0,35,0.8)" }, // wider & stronger shadow
+              { boxShadow: "0 0 0 rgba(230,0,35,0)" },
+            ],
+            { duration: 5000 }
+          );
+        }
+        suggestionBox.style.display = "none";
+        document.querySelector(".overlay").style.display = "none";
+      });
+    });
 
     document.addEventListener("click", function (e) {
       if (e.target.id !== "searchinput" && !e.target.closest(".searchdata")) {
